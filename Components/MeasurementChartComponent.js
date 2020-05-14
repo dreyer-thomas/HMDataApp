@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import { AreaChart, Grid, YAxis, XAxis } from 'react-native-svg-charts';
 import * as shape from 'd3-shape';
+import * as scale from 'd3-scale';
 import { View, Text, Dimensions, StyleSheet, ScrollView}  from 'react-native';
 import { ButtonGroup } from 'react-native-elements';
 import { fetchChart, chartLoading } from '../redux/ActionCreators';
 import { connect } from 'react-redux';
 import { Loading } from './LoadingComponent'; 
-
+import moment from 'moment';
 
 const mapStateToProps = state => {
     return {
@@ -64,10 +65,25 @@ class MeasurementChart extends Component {
         }
         else {           
             if (this.props.chart.chartData && this.props.chart.chartData.values.length > 0) {
-                
-                var minValue = Math.min(...this.props.chart.chartData.values);
-                var maxValue = Math.max(...this.props.chart.chartData.values);
 
+                var minValue = Number.MAX_VALUE;
+                var maxValue = Number.MIN_VALUE;
+                var minValueTime = ' ';
+                var maxValueTime = ' ';
+                for (i=0; i<this.props.chart.chartData.values.length; i++) {
+                    if (this.props.chart.chartData.values[i].value < minValue) {
+                        minValue = this.props.chart.chartData.values[i].value;
+                        minValueTime = this.props.chart.chartData.values[i].time;
+                    }
+                    if (this.props.chart.chartData.values[i].value > maxValue) {
+                        maxValue = this.props.chart.chartData.values[i].value;
+                        maxValueTime = this.props.chart.chartData.values[i].time;
+                    }
+                    var date = Date.parse(this.props.chart.chartData.values[i].time);
+                }
+
+                
+                
                 return(
                     <ScrollView style={styles.grayBox}>
                         <View style={styles.whiteBox}> 
@@ -106,37 +122,47 @@ class MeasurementChart extends Component {
                             <View style={styles.chartBox}>
                                 <YAxis
                                     style = {styles.chartYAxis}
-                                    data={this.props.chart.chartData.values}
+                                    data = {this.props.chart.chartData.values}
+                                    yAccessor = { ({item}) => parseFloat(item.value)}
                                     contentInset={{ top: 20, bottom: 20 }}
                                     svg={{
                                         fill: 'grey',
                                         fontSize: 10,
                                     }}
                                     numberOfTicks={10}
-                                    formatLabel={(value) => `${value}°C`}
+                                    formatLabel={(value) => `${value}`}
                                 />
                                 <View style={{ flex: 1, marginLeft: 10 }}>
                                     <AreaChart 
                                         style = {styles.chart}
                                         data  = {this.props.chart.chartData.values}
+                                        yAccessor = { ({item}) => parseFloat(item.value)}
+                                        xAccessor = { ({item}) => Date.parse(item.time)}
+                                        xScale={scale.scaleTime}
                                         contentInset={{ top: 30, bottom: 30 }}
                                         curve={shape.curveNatural}
                                         svg={{ fill: 'rgba(180, 0, 0, 0.5)' , stroke: 'rgb(100, 0, 0)' }} 
                                         >
                                             <Grid />
                                     </AreaChart>
-                                    
+                                    <XAxis 
+                                        data = {this.props.chart.chartData.values}
+                                        xAccessor = { ({item}) => Date.now()}
+                                        xScale={scale.scaleTime}
+                                        numberOfTicks={10}
+                                        formatLabel={(value) => moment(value).format('HH:mm:ss')}
+                                    />
                                 </View>
                             </View>
                         </View>
                         <View style={styles.whiteBox}>
                             <View style={styles.innerBox}>
-                                <Text style={styles.labelText}>Min Value:</Text>
-                                <Text style={styles.contentText}>{minValue}</Text>
+                                <Text style={styles.labelText}>Min</Text>
+                                <Text style={styles.contentText}>{minValue} at {minValueTime}</Text>
                             </View>
                             <View style={styles.innerBox}>
-                                <Text style={styles.labelText}>Max Value:</Text>
-                                <Text style={styles.contentText}>{maxValue}</Text>
+                                <Text style={styles.labelText}>Max</Text>
+                                <Text style={styles.contentText}>{maxValue} at {maxValueTime}</Text>
                             </View>
                         </View>
                     </ScrollView>
@@ -163,7 +189,7 @@ const styles = StyleSheet.create({
     contentText: {
         fontSize: 16,
         marginTop: 5,
-        flex: 2
+        flex: 4
     },
     grayBox: {
         backgroundColor:'lightgray'

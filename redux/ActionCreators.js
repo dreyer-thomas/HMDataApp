@@ -104,12 +104,15 @@ export const fetchChart = (channel, measurement,duration) => (dispatch) => {
         .then(response => response.json())
         .then(chartData => {
             //convert array of strings to floats
-            var stringArray = chartData.values;
+            /*
+            var rawArray = chartData.values;
             var valueArray = [];
-            stringArray.forEach(element => {
-                valueArray.push(parseFloat(element));
+            rawArray.forEach(element => {
+                valueArray.push({
+                    value: parseFloat(element.value),
+                    time: element.time});
             });
-            chartData.values = valueArray;
+            chartData.values = valueArray;*/
             dispatch(addChart(chartData));
         })
         .catch(error => dispatch(chartFailed(error.message)))
