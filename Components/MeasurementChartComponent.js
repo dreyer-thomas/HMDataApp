@@ -115,7 +115,9 @@ class MeasurementChart extends Component {
                                 buttons={['24h','48h','7 days','30 days']}
                                 containerStyle={{height: 40, borderColor: 'white'}}
                                 buttonStyle={styles.buttonStyle}
-                                onPress={(index) => this.timeRangeSelected(index)}
+                                onPress={(index) => {
+                                    this.timeRangeSelected(index);
+                                }}
                             />
                         </View>
                         <View style={styles.whiteBox}>
@@ -132,12 +134,12 @@ class MeasurementChart extends Component {
                                     numberOfTicks={10}
                                     formatLabel={(value) => `${value}`}
                                 />
-                                <View style={{ flex: 1, marginLeft: 10 }}>
+                                <View style={{ flex: 1, marginLeft: 5 }}>
                                     <AreaChart 
                                         style = {styles.chart}
                                         data  = {this.props.chart.chartData.values}
                                         yAccessor = { ({item}) => parseFloat(item.value)}
-                                        xAccessor = { ({item}) => Date.parse(item.time)}
+                                        xAccessor = { ({item}) => new Date(Date.parse(item.time))}
                                         xScale={scale.scaleTime}
                                         contentInset={{ top: 30, bottom: 30 }}
                                         curve={shape.curveNatural}
@@ -147,10 +149,19 @@ class MeasurementChart extends Component {
                                     </AreaChart>
                                     <XAxis 
                                         data = {this.props.chart.chartData.values}
-                                        xAccessor = { ({item}) => Date.now()}
+                                        xAccessor = { ({item}) => Date.parse(item.time)}
                                         xScale={scale.scaleTime}
-                                        numberOfTicks={10}
-                                        formatLabel={(value) => moment(value).format('HH:mm:ss')}
+                                        numberOfTicks={9}
+                                        formatLabel={(value) => moment(value).format('HH:mm')}
+                                        contentInset={{ left: 10, right: 0 }}
+                                        svg={{
+                                            fill: 'black',
+                                            fontSize: 10,
+                                            rotation: -45,
+                                            originY: 14,
+                                            y: 5,
+                                        }}
+                                        style={{ marginTop: -10, marginHorizontal: 0, height: 40 }}
                                     />
                                 </View>
                             </View>
@@ -212,17 +223,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     chartYAxis: {
-        height: 500, 
-        marginTop: 10,
+        height: 465, 
+        marginTop: 20,
         marginLeft: 10,
         marginBottom: 10,
         flex: 0
     },
     chart: {
         flex:1,
-        marginTop: 8,
+        marginTop: 10,
         marginRight: 8,
-        marginBottom: 8,
+        marginBottom: 20,
         height: 500
     },
     buttonStyle: {
