@@ -73,9 +73,6 @@ class DeviceDetail extends Component {
 
             return (
                 <View>
-                    <Text>Device ID: {this.props.deviceDetails.deviceDetails.deviceid}</Text>
-                    <Text>Name: {this.props.deviceDetails.deviceDetails.name}</Text>
-                    <Text>Type: {this.props.deviceDetails.deviceDetails.type}</Text>
                     <FlatList
                         data={Measurements} 
                         renderItem={renderMeasurementItem}

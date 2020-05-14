@@ -1,5 +1,6 @@
 import * as ActionTypes from './ActionTypes';
 import { baseUrl } from '../shared/config';
+import { chart } from './chartData';
 
 //Device List in Devices Page
 
@@ -76,10 +77,11 @@ export const addDeviceDetails = (deviceDetails) => ({
 
 // Chart Loading
 
-export const fetchChart = (channel, measurement) => (dispatch) => {
+export const fetchChart = (channel, measurement,duration) => (dispatch) => {
     dispatch(chartLoading);
     //define last 24 hours to fetch
-    var yesterday = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
+    if (!duration) {duration = 24 * 60 * 60 * 1000;}
+    var yesterday = new Date(new Date().getTime() - duration);
     var today = new Date(Date.now());
     startTime = yesterday.toISOString();
     endTime = today.toISOString();
@@ -100,12 +102,21 @@ export const fetchChart = (channel, measurement) => (dispatch) => {
             throw errMess;
         })
         .then(response => response.json())
-        .then(chartData => dispatch(addChart(chartData)))
+        .then(chartData => {
+            //convert array of strings to floats
+            var stringArray = chartData.values;
+            var valueArray = [];
+            stringArray.forEach(element => {
+                valueArray.push(parseFloat(element));
+            });
+            chartData.values = valueArray;
+            dispatch(addChart(chartData));
+        })
         .catch(error => dispatch(chartFailed(error.message)))
 }
 
 export const chartLoading = () => ({
-    type: ActionTypes.CHART_LOADINGG,
+    type: ActionTypes.CHART_LOADING,
     payload: null
 })
 
