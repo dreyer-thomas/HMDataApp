@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { AreaChart, Grid, YAxis, XAxis } from 'react-native-svg-charts';
+import { AreaChart, LineChart, Grid, YAxis, XAxis } from 'react-native-svg-charts';
 import * as shape from 'd3-shape';
 import * as scale from 'd3-scale';
 import { View, Text, Dimensions, StyleSheet, ScrollView}  from 'react-native';
@@ -70,6 +70,10 @@ class MeasurementChart extends Component {
                 var maxValue = Number.MIN_VALUE;
                 var minValueTime = ' ';
                 var maxValueTime = ' ';
+                var values = [];
+                var from = new Date(Date.parse(this.props.chart.chartData.from));
+                var to = new Date(Date.parse(this.props.chart.chartData.to));
+
                 for (i=0; i<this.props.chart.chartData.values.length; i++) {
                     if (this.props.chart.chartData.values[i].value < minValue) {
                         minValue = this.props.chart.chartData.values[i].value;
@@ -79,9 +83,16 @@ class MeasurementChart extends Component {
                         maxValue = this.props.chart.chartData.values[i].value;
                         maxValueTime = this.props.chart.chartData.values[i].time;
                     }
-                    var date = Date.parse(this.props.chart.chartData.values[i].time);
+                    values.push({
+                        value: parseFloat(this.props.chart.chartData.values[i].value),
+                        time: new Date(Date.parse(this.props.chart.chartData.values[i].time)),
+                        index: i
+                    });
                 }
 
+                console.log('----- VALUES')
+                console.log(values);
+                console.log('----- VALUES END')
                 
                 
                 return(
@@ -124,8 +135,8 @@ class MeasurementChart extends Component {
                             <View style={styles.chartBox}>
                                 <YAxis
                                     style = {styles.chartYAxis}
-                                    data = {this.props.chart.chartData.values}
-                                    yAccessor = { ({item}) => parseFloat(item.value)}
+                                    data = {values}
+                                    yAccessor = {({item}) => item.value }
                                     contentInset={{ top: 20, bottom: 20 }}
                                     svg={{
                                         fill: 'grey',
@@ -137,10 +148,10 @@ class MeasurementChart extends Component {
                                 <View style={{ flex: 1, marginLeft: 5 }}>
                                     <AreaChart 
                                         style = {styles.chart}
-                                        data  = {this.props.chart.chartData.values}
-                                        yAccessor = { ({item}) => parseFloat(item.value)}
-                                        xAccessor = { ({item}) => new Date(Date.parse(item.time))}
-                                        xScale={scale.scaleTime}
+                                        data  = {values}
+                                        yAccessor = { ({item}) => item.value}
+                                        xAccessor = { ({item}) => item.index}
+                                        xScale={scale.scaleLinear}
                                         contentInset={{ top: 30, bottom: 30 }}
                                         curve={shape.curveNatural}
                                         svg={{ fill: 'rgba(180, 0, 0, 0.5)' , stroke: 'rgb(100, 0, 0)' }} 
@@ -148,8 +159,8 @@ class MeasurementChart extends Component {
                                             <Grid />
                                     </AreaChart>
                                     <XAxis 
-                                        data = {this.props.chart.chartData.values}
-                                        xAccessor = { ({item}) => Date.parse(item.time)}
+                                        data = {values}
+                                        xAccessor = { ({item}) => item.time}
                                         xScale={scale.scaleTime}
                                         numberOfTicks={9}
                                         formatLabel={(value) => moment(value).format('HH:mm')}
