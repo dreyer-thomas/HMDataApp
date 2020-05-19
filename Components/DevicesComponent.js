@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Loading } from './LoadingComponent';
 import { fetchDevices } from '../redux/ActionCreators';
 import { ListItem, Icon } from 'react-native-elements';
+import SwipeOut from 'react-native-swipeout';
 
 const mapStateToProps = state => {
     return {
@@ -29,16 +30,25 @@ class Devices extends Component {
         const { navigate } = this.props.navigation;
 
         const renderMenuItem = ({item, index}) => {
+            const rightButton = [
+                {
+                    text: 'Edit',
+                    type: 'Edit',
+                    onPress: () => navigate('EditDevice', {deviceId: item.id})
+                }
+            ]
             return(
-                <ListItem
-                    key={index}
-                    leftIcon={<Icon type="font-awesome" name="home" size={24}/> }
-                    title={<Text style={{fontSize:16, fontWeight: 'bold'}}>{item.name}</Text>}
-                    subtitle={<View><Text style={{fontSize:11}}>{item.device} ({item.type})</Text></View>}
-                    bottomDivider
-                    chevron
-                    onPress={ () => navigate('DeviceDetail', {deviceId: item.id})}
-                />
+                <SwipeOut right={rightButton} autoClose={true}>
+                    <ListItem
+                        key={index}
+                        leftIcon={<Icon type="font-awesome" name="home" size={24}/> }
+                        title={<Text style={{fontSize:16, fontWeight: 'bold'}}>{item.name}</Text>}
+                        subtitle={<View><Text style={{fontSize:11}}>{item.device} ({item.type})</Text></View>}
+                        bottomDivider
+                        chevron
+                        onPress={ () => navigate('DeviceDetail', {deviceId: item.id})}
+                    />
+                </SwipeOut>
             );
         }
 

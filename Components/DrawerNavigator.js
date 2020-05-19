@@ -9,6 +9,9 @@ import Devices from './DevicesComponent';
 import Channels from './ChannelsComponent';
 import DeviceDetail from './DeviceDetailComponent';
 import MeasurementChart from './MeasurementChartComponent';
+import EditDevice from './EditDeviceComponent';
+import EditChannel from './EditChannelComponent';
+import EditChannelComponent from './EditChannelComponent';
 
 
 const CustomDrawerContentComponent = (props) => (
@@ -25,7 +28,9 @@ const CustomDrawerContentComponent = (props) => (
 const DevicesNavigator = createStackNavigator({
     Devices: { screen: Devices },
     DeviceDetail: {screen: DeviceDetail},
-    Chart: {screen: MeasurementChart}
+    Chart: {screen: MeasurementChart},
+    EditDevice: {screen: EditDevice},
+    EditChannel: {screen: EditChannelComponent}
 }, {
     navigationOptions:  ({navigation}) => ({
         headerLeft: <Icon name='menu' size={24} iconStyle={{color:'white'}} 

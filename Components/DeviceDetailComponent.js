@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Loading } from './LoadingComponent';
 import { fetchDeviceDetails } from '../redux/ActionCreators';
 import { ListItem, Icon } from 'react-native-elements';
+import SwipeOut from 'react-native-swipeout';
 
 const mapStateToProps = state => {
     return {
@@ -45,16 +46,25 @@ class DeviceDetail extends Component {
         }
         else {
             const renderMeasurementItem = ({item, index}) => {
+                const rightButton = [
+                    {
+                        text: 'Edit',
+                        type: 'Edit',
+                        onPress: () => navigate('EditChannel', {measurement: item.name})
+                    }
+                ]
                 return(
-                    <ListItem
-                        key={index}
-                        leftIcon={<Icon type="font-awesome" name="laptop" size={24}/> }
-                        title={<Text style={{fontSize:16, fontWeight: 'bold'}}>{item.name}</Text>}
-                        subtitle={<View><Text style={{fontSize:11}}>{item.count})</Text></View>}
-                        bottomDivider
-                        chevron
-                        onPress={ () => navigate('Chart', {channelId: item.channel, measurement: item.name})}
-                    />
+                    <SwipeOut right={rightButton} autoClose={true}>
+                        <ListItem
+                            key={index}
+                            leftIcon={<Icon type="font-awesome" name="laptop" size={24}/> }
+                            title={<Text style={{fontSize:16, fontWeight: 'bold'}}>{item.name}</Text>}
+                            subtitle={<View><Text style={{fontSize:11}}>({item.count} rows found)</Text></View>}
+                            bottomDivider
+                            chevron
+                            onPress={ () => navigate('Chart', {channelId: item.channel, measurement: item.name})}
+                        />
+                    </SwipeOut>
                 );
             }
             //scan all channels for measurements
