@@ -71,17 +71,19 @@ class MeasurementChart extends Component {
                 var minValueTime = ' ';
                 var maxValueTime = ' ';
                 var values = [];
-                var from = new Date(Date.parse(this.props.chart.chartData.from));
-                var to = new Date(Date.parse(this.props.chart.chartData.to));
+                var from = new Date(this.props.chart.chartData.from).toLocaleString();
+                var to = new Date(this.props.chart.chartData.to).toLocaleString();
+                var curValue = Number(this.props.chart.chartData.values[this.props.chart.chartData.values.length-1].value);
+                var curValueTime = new Date(this.props.chart.chartData.values[this.props.chart.chartData.values.length-1].time).toLocaleString();
 
                 for (i=0; i<this.props.chart.chartData.values.length; i++) {
-                    if (this.props.chart.chartData.values[i].value < minValue) {
+                    if (Number(this.props.chart.chartData.values[i].value) < minValue) {
                         minValue = this.props.chart.chartData.values[i].value;
-                        minValueTime = this.props.chart.chartData.values[i].time;
+                        minValueTime = new Date(this.props.chart.chartData.values[i].time).toLocaleString();
                     }
-                    if (this.props.chart.chartData.values[i].value > maxValue) {
+                    if (Number(this.props.chart.chartData.values[i].value) > maxValue) {
                         maxValue = this.props.chart.chartData.values[i].value;
-                        maxValueTime = this.props.chart.chartData.values[i].time;
+                        maxValueTime = new Date(this.props.chart.chartData.values[i].time).toLocaleString();
                     }
                     values.push({
                         value: parseFloat(this.props.chart.chartData.values[i].value),
@@ -89,105 +91,105 @@ class MeasurementChart extends Component {
                         index: i
                     });
                 }
-
-                console.log('----- VALUES')
-                console.log(values);
-                console.log('----- VALUES END')
-                
                 
                 return(
-                    <ScrollView style={styles.grayBox}>
-                        <View style={styles.whiteBox}> 
-                            <View style={{marginBottom: 8 }}>
-                                <View style={styles.innerBox}>
-                                    <Text style={styles.labelText}>Channel</Text>
-                                    <Text style={styles.contentText}>{this.props.chart.chartData.channel_name}</Text>
-                                </View>
-                                <View style={styles.innerBox}>
-                                    <Text style={styles.labelText}>Value</Text>
-                                    <Text style={styles.contentText}>{this.props.chart.chartData.measurement}</Text>
-                                </View>
-                                <View style={styles.innerBox}>
-                                    <Text style={styles.labelText}>from</Text>
-                                    <Text style={styles.contentText}>{this.props.chart.chartData.from}</Text>
-                                </View>
-                                <View style={styles.innerBox}>
-                                    <Text style={styles.labelText}>to</Text>
-                                    <Text style={styles.contentText}>{this.props.chart.chartData.to}</Text>
-                                </View>
-                                <View style={styles.innerBox}>
-                                    <Text style={styles.labelText}>Count</Text>
-                                    <Text style={styles.contentText}>{JSON.stringify(this.props.chart.chartData.values.length,null,4)}</Text>
+                    <View>
+                        <ScrollView style={styles.grayBox}>
+                            <View style={styles.whiteBox}> 
+                                <View style={{marginBottom: 8 }}>
+                                    <View style={styles.innerBox}>
+                                        <Text style={styles.labelText}>Channel</Text>
+                                        <Text style={styles.contentText}>{this.props.chart.chartData.channel_name}</Text>
+                                    </View>
+                                    <View style={styles.innerBox}>
+                                        <Text style={styles.labelText}>Value</Text>
+                                        <Text style={styles.contentText}>{this.props.chart.chartData.measurement}</Text>
+                                    </View>
+                                    <View style={styles.innerBox}>
+                                        <Text style={styles.labelText}>from</Text>
+                                        <Text style={styles.contentText}>{from}</Text>
+                                    </View>
+                                    <View style={styles.innerBox}>
+                                        <Text style={styles.labelText}>to</Text>
+                                        <Text style={styles.contentText}>{to}</Text>
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                        <View style={styles.whiteBox}>
-                            <ButtonGroup
-                                buttons={['24h','48h','7 days','30 days']}
-                                containerStyle={{height: 40, borderColor: 'white'}}
-                                buttonStyle={styles.buttonStyle}
-                                onPress={(index) => {
-                                    this.timeRangeSelected(index);
-                                }}
-                            />
-                        </View>
-                        <View style={styles.whiteBox}>
-                            <View style={styles.chartBox}>
-                                <YAxis
-                                    style = {styles.chartYAxis}
-                                    data = {values}
-                                    yAccessor = {({item}) => item.value }
-                                    contentInset={{ top: 20, bottom: 20 }}
-                                    svg={{
-                                        fill: 'grey',
-                                        fontSize: 10,
+                            <View style={styles.whiteBox}>
+                                <ButtonGroup
+                                    buttons={['24h','48h','7 days','30 days']}
+                                    containerStyle={{height: 40, borderColor: 'white'}}
+                                    buttonStyle={styles.buttonStyle}
+                                    onPress={(index) => {
+                                        this.timeRangeSelected(index);
                                     }}
-                                    numberOfTicks={10}
-                                    formatLabel={(value) => `${value}`}
                                 />
-                                <View style={{ flex: 1, marginLeft: 5 }}>
-                                    <AreaChart 
-                                        style = {styles.chart}
-                                        data  = {values}
-                                        yAccessor = { ({item}) => item.value}
-                                        xAccessor = { ({item}) => item.index}
-                                        xScale={scale.scaleLinear}
-                                        contentInset={{ top: 30, bottom: 30 }}
-                                        curve={shape.curveNatural}
-                                        svg={{ fill: 'rgba(180, 0, 0, 0.5)' , stroke: 'rgb(100, 0, 0)' }} 
-                                        >
-                                            <Grid />
-                                    </AreaChart>
-                                    <XAxis 
+                            </View>
+                            <View style={styles.whiteBox}>
+                                <View style={styles.chartBox}>
+                                    <YAxis
+                                        style = {styles.chartYAxis}
                                         data = {values}
-                                        xAccessor = { ({item}) => item.time}
-                                        xScale={scale.scaleTime}
-                                        numberOfTicks={9}
-                                        formatLabel={(value) => moment(value).format('HH:mm')}
-                                        contentInset={{ left: 10, right: 0 }}
+                                        yAccessor = {({item}) => item.value }
+                                        contentInset={{ top: 20, bottom: 20 }}
                                         svg={{
-                                            fill: 'black',
+                                            fill: 'grey',
                                             fontSize: 10,
-                                            rotation: -45,
-                                            originY: 14,
-                                            y: 5,
                                         }}
-                                        style={{ marginTop: -10, marginHorizontal: 0, height: 40 }}
+                                        numberOfTicks={10}
+                                        formatLabel={(value) => `${value}`}
                                     />
+                                    <View style={{ flex: 1, marginLeft: 5 }}>
+                                        <AreaChart 
+                                            style = {styles.chart}
+                                            data  = {values}
+                                            yAccessor = { ({item}) => item.value}
+                                            xAccessor = { ({item}) => item.index}
+                                            xScale={scale.scaleLinear}
+                                            contentInset={{ top: 30, bottom: 30 }}
+                                            curve={shape.curveNatural}
+                                            svg={{ fill: 'rgba(180, 0, 0, 0.5)' , stroke: 'rgb(100, 0, 0)' }} 
+                                            >
+                                                <Grid />
+                                        </AreaChart>
+                                        <XAxis 
+                                            data = {values}
+                                            xAccessor = { ({item}) => item.time}
+                                            xScale={scale.scaleTime}
+                                            numberOfTicks={9}
+                                            formatLabel={(value) => moment(value).format('HH:mm')}
+                                            contentInset={{ left: 10, right: 0 }}
+                                            svg={{
+                                                fill: 'black',
+                                                fontSize: 10,
+                                                rotation: -45,
+                                                originY: 14,
+                                                y: 5,
+                                            }}
+                                            style={{ marginTop: -10, marginHorizontal: 0, height: 40 }}
+                                        />
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                        <View style={styles.whiteBox}>
-                            <View style={styles.innerBox}>
-                                <Text style={styles.labelText}>Min</Text>
-                                <Text style={styles.contentText}>{minValue} at {minValueTime}</Text>
+                            <View style={styles.whiteBox}>
+                                <View style={styles.innerBox}>
+                                    <Text style={styles.labelText}>Min</Text>
+                                    <Text style={styles.bigContentText}>{minValue}</Text>
+                                    <Text style={styles.smallContentText}>{minValueTime}</Text>
+                                </View>
+                                <View style={styles.innerBox}>
+                                    <Text style={styles.labelText}>Max</Text>
+                                    <Text style={styles.bigContentText}>{maxValue}</Text>
+                                    <Text style={styles.smallContentText}>{maxValueTime}</Text>
+                                </View>
+                                <View style={styles.innerBox}>
+                                    <Text style={styles.labelText}>Now</Text>
+                                    <Text style={styles.bigContentText}>{curValue}</Text>
+                                    <Text style={styles.smallContentText}>{curValueTime}</Text>
+                                </View>
                             </View>
-                            <View style={styles.innerBox}>
-                                <Text style={styles.labelText}>Max</Text>
-                                <Text style={styles.contentText}>{maxValue} at {maxValueTime}</Text>
-                            </View>
-                        </View>
-                    </ScrollView>
+                        </ScrollView>
+                    </View>
                 );
             }
             else {
@@ -213,15 +215,26 @@ const styles = StyleSheet.create({
         marginTop: 5,
         flex: 4
     },
+    bigContentText: {
+        fontSize: 24,
+        marginTop: 0,
+        flex: 2
+    },  
+    smallContentText: {
+        fontSize: 12,
+        marginTop: 12,
+        flex: 2
+    },
     grayBox: {
         backgroundColor:'lightgray'
     },
     whiteBox: {
         backgroundColor:'white', 
         borderRadius: 16, 
-        marginTop:8,
+        marginTop: 3,
         marginLeft: 5,
         marginRight: 5,
+        marginBottom: 3,
         flexDirection: 'column'
     },
     innerBox: {
@@ -229,12 +242,12 @@ const styles = StyleSheet.create({
     },  
     chartBox: {
         borderRadius: 16,
-        height: 500, 
+        height: 480, 
         margin: 10,
         flexDirection: 'row'
     },
     chartYAxis: {
-        height: 465, 
+        height: 400, 
         marginTop: 20,
         marginLeft: 10,
         marginBottom: 10,
@@ -253,40 +266,5 @@ const styles = StyleSheet.create({
     }
   });
 
-/*
-                        <View style={{marginLeft: 5}}>
-                            <LineChart
-                                data={{
-                                    labels: ['Last 24 hours'],
-                                    datasets: [{
-                                        data: this.props.chart.chartData.values,
-                                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                        strokeWidth: 1
-                                    }]
-                                }}
-                                withDots={false}
-                                width={Dimensions.get("window").width-10} // from react-native
-                                height={ 550}
-                                yAxisSuffix=" "
-                                yAxisInterval = {this.props.chart.chartData.values.length / 5}
-                                strokeWidth='2'
-                                chartConfig={{
-                                    backgroundColor: "#4040FF",
-                                    backgroundGradientFrom: "#F0F0F1",
-                                    backgroundGradientTo: "#FFFFFF",
-                                    decimalPlaces: 2,
-                                    color: (opacity = 0) => `rgba(0, 0, 200, 0.2)`,
-                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                    propsForDots: {
-                                        r: "0",
-                                        strokeWidth: "0",
-                                        stroke: "#000000"
-                                    }
-                                }}
-                                bezier
-                                style={styles.chart}
-                            />
-                        </View>
-*/
 
 export default connect(mapStateToProps,mapDispatchToProps)(MeasurementChart);
